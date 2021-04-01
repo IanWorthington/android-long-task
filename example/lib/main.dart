@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'app_service_config.dart';
+import 'LocalNotification.dart';
+
+
 
 AppServiceData data = AppServiceData();
 
@@ -108,21 +111,43 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+//this entire function runs in your ForegroundService
+//needs this pragma to run in release mode
+//function name may be defined in AppService.kt?
+@pragma('vm:entry-point')
 serviceMain() async {
   // print(arg);
   WidgetsFlutterBinding.ensureInitialized();
+
+  //if your use dependency injection you initialize them here
+  //what ever objects you created in your app main function is not accessible here
+
+  //set a callback and define the code you want to execute when your ForegroundService runs
+
   ServiceClient.setExecutionCallback((initialData) async {
+    //you set initialData when you are calling AppClient.execute()
+    //from your flutter application code and receive it here
     var serviceData = AppServiceData.fromJson(initialData);
+
     for (var i = 0; i < 100; i++) {
+      var notification = LocalNotification();
+      notification.showNotificationWithoutSound("From background service", "progress: $i");
+
       print('dart -> $i');
       data.progress = i;
       var result2 = await ServiceClient.update(data);
+
       if (i > 10) {
+        // end the execute() that started the foreground service
         await ServiceClient.endExecution(data);
+
+        // stop foreground service itself
         var result = await ServiceClient.stopService();
         print(result);
       }
-      await Future.delayed(const Duration(seconds: 1));
+
+      // sleep a bit
+      await Future.delayed(const Duration(seconds: 10));
     }
   });
 }
