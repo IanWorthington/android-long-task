@@ -59,21 +59,26 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             Text('$_status', textAlign: TextAlign.center),
             SizedBox(height: 20),
-            Text('$_result', textAlign: TextAlign.center, style: Theme.of(context).textTheme.headline6),
-            RaisedButton(
+            Text('$_result',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headline6),
+            ElevatedButton(
+              child: Text('run dart function'),
               onPressed: () async {
+                // This code starts the foreground service
                 try {
                   var result = await AppClient.execute(data);
                   var resultData = AppServiceData.fromJson(result);
-                  setState(() => _result = 'finished executing service process ;) -> ${resultData.progress}');
+                  setState(() => _result =
+                      'finished executing service process ;) -> ${resultData.progress}');
                 } on PlatformException catch (e, stacktrace) {
                   print(e);
                   print(stacktrace);
                 }
               },
-              child: Text('run dart function'),
             ),
-            RaisedButton(
+            ElevatedButton(
+              child: Text('get service data'),
               onPressed: () async {
                 try {
                   var result = await AppClient.getData();
@@ -83,9 +88,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   print(stacktrace);
                 }
               },
-              child: Text('get service data'),
             ),
-            RaisedButton(
+            ElevatedButton(
+              child: Text('stop service'),
               onPressed: () async {
                 try {
                   await AppClient.stopService();
@@ -95,7 +100,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   print(stacktrace);
                 }
               },
-              child: Text('stop service'),
             ),
           ],
         ),
